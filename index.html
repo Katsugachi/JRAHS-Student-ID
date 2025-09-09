@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Student ID Encoder - JRAHS</title>
+<style>
+:root { --ink:#000; --bg:#fff; --r:14px; }
+body { margin:0; font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:#000; display:flex; flex-direction:column; min-height:100vh; }
+header { background:#000; color:#fff; padding:14px 16px; font-size:18px; font-weight:700; border-bottom:2px solid var(--ink); }
+main { flex:1; display:grid; grid-template-columns:320px 1fr; gap:14px; padding:14px; }
+@media(max-width:820px){ main { grid-template-columns:1fr; } }
+.panel { border:2px solid var(--ink); border-radius:var(--r); padding:14px; background:var(--bg); }
+label { display:flex; flex-direction:column; gap:6px; font-weight:600; margin-bottom:10px; }
+input,button { padding:10px 12px; border-radius:var(--r); border:2px solid var(--ink); font:inherit; }
+button { background:#000; color:#fff; cursor:pointer; font-weight:700; border:none; }
+.preview { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:240px; background:#fff; border:2px solid var(--ink); border-radius:var(--r); padding:10px; }
+svg { display:block; }
+.bar-text { font:16px monospace; fill:#000; dominant-baseline:hanging; }
+</style>
+</head>
+<body>
+<header>Student ID Encoder - JRAHS</header>
+<main>
+<form id="f" class="panel">
+  <label>Number<input id="data" placeholder="Enter your ID" inputmode="text"/></label>
+  <label>Scale<input id="scale" type="number" min="1" max="10" value="2"/></label>
+  <label>Height<input id="height" type="number" min="40" max="320" value="50"/></label>
+  <button type="submit">Generate</button>
+</form>
+<div class="panel"><div id="preview" class="preview">Your barcode will appear here</div></div>
+</main>
+<footer style="border-top:2px solid var(--ink);padding:10px 16px;font-size:.85rem;color:#333;">
+Offline — Code 39 with printed number.
+</footer>
+<script>
+// Code 39 patterns: narrow=1, wide=3 modules
+const CODE39 = {
+  '0':"101001101101",'1':"110100101011",'2':"101100101011",'3':"110110010101",
+  '4':"101001101011",'5':"110100110101",'6':"101100110101",'7':"101001011011",
+  '8':"110100101101",'9':"101100101101",'A':"110101001011",'B':"101101001011",
+  'C':"110110100101",'D':"101011001011",'E':"110101100101",'F':"101101100101",
+  'G':"101010011011",'H':"110101001101",'I':"101101001101",'J':"101011001101",
+  'K':"110101010011",'L':"101101010011",'M':"110110101001",'N':"101011010011",
+  'O':"110101101001",'P':"101101101001",'Q':"101010110011",'R':"110101011001",
+  'S':"101101011001",'T':"101011011001",'U':"110010101011",'V':"100110101011",
+  'W':"110011010101",'X':"100101101011",'Y':"110010110101",'Z':"100110110101",
+  '-':"100101011011",'.':"110010101101",' ':"100110101101",'$':"100100100101",
+  '/':"100100101001",'+':"100101001001",'%':"101001001001",
+  '*':"100101101101" // Start/stop
+};
+function code39Pattern(text){
+  text = '*'+text.toUpperCase()+'*';
+  let pattern = '';
+  for(let i=0;i<text.length;i++){
+    const p = CODE39[text[i]];
+    if(!p) throw Error('Invalid character: '+text[i]);
+    pattern += p + '0'; // inter-character narrow space
+  }
+  return pattern.slice(0,-1); // remove last space
+}
+function makeSVG(pattern, scale, height, text){
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  const quiet = 10*scale;
+  const totalW = quiet*2 + pattern.length*scale;
+  svg.setAttribute("width", totalW);
+  svg.setAttribute("height", height+20);
+  let x = quiet;
+  for(let i=0;i<pattern.length;i++){
+    if(pattern[i]==='1'){
+      const r = document.createElementNS(svg.namespaceURI,'rect');
+      r.setAttribute('x',x);
+      r.setAttribute('y',0);
+      r.setAttribute('width',scale);
+      r.setAttribute('height',height);
+      r.setAttribute('fill','#000');
+      svg.appendChild(r);
+    }
+    x += scale;
+  }
+  const t = document.createElementNS(svg.namespaceURI,'text');
+  t.setAttribute('x', totalW/2);
+  t.setAttribute('y', height+2);
+  t.setAttribute('text-anchor','middle');
+  t.setAttribute('class','bar-text');
+  t.textContent = text;
+  svg.appendChild(t);
+  return svg;
+}
+function generate(e){
+  e && e.preventDefault();
+  const prev = document.getElementById('preview');
+  prev.innerHTML='';
+  try{
+    const val = document.getElementById('data').value.trim();
+    if(!val) throw Error('Enter data');
+    const scale = parseInt(document.getElementById('scale').value)||2;
+    const height = parseInt(document.getElementById('height').value)||80;
+    const pattern = code39Pattern(val);
+    const svg = makeSVG(pattern, scale, height, val.toUpperCase());
+    prev.appendChild(svg);
+  }catch(err){ prev.textContent = err.message; }
+}
+document.getElementById('f').addEventListener('submit',generate);
+</script>
+</body>
+</html>
