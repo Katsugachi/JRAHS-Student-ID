@@ -3,38 +3,800 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Student ID Encoder - JRAHS</title>
+<title>Student ID Encoder — JRAHS</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root { --ink:#000; --bg:#fff; --r:14px; }
-body { margin:0; font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:#000; display:flex; flex-direction:column; min-height:100vh; }
-header { background:#000; color:#fff; padding:14px 16px; font-size:18px; font-weight:700; border-bottom:2px solid var(--ink); }
-main { flex:1; display:grid; grid-template-columns:320px 1fr; gap:14px; padding:14px; }
-@media(max-width:820px){ main { grid-template-columns:1fr; } }
-.panel { border:2px solid var(--ink); border-radius:var(--r); padding:14px; background:var(--bg); }
-label { display:flex; flex-direction:column; gap:6px; font-weight:600; margin-bottom:10px; }
-input,button { padding:10px 12px; border-radius:var(--r); border:2px solid var(--ink); font:inherit; }
-button { background:#000; color:#fff; cursor:pointer; font-weight:700; border:none; }
-.preview { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:240px; background:#fff; border:2px solid var(--ink); border-radius:var(--r); padding:10px; }
-svg { display:block; }
-.bar-text { font:16px monospace; fill:#000; dominant-baseline:hanging; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --dark:    #141413;
+  --light:   #faf9f5;
+  --mid:     #b0aea5;
+  --subtle:  #e8e6dc;
+  --orange:  #d97757;
+  --blue:    #6a9bcc;
+  --green:   #788c5d;
+  --paper:   #fffefa;
+  --ink-2:   #343431;
+  --line:    rgba(20,20,19,0.12);
+  --shadow:  0 24px 70px rgba(20,20,19,0.10), 0 2px 12px rgba(20,20,19,0.05);
+  --radius:  18px;
+  --mono:    'JetBrains Mono', 'Courier New', monospace;
+}
+
+body {
+  font-family: 'Lora', Georgia, serif;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(217,119,87,0.13), transparent 29rem),
+    radial-gradient(circle at 88% 16%, rgba(106,155,204,0.14), transparent 27rem),
+    linear-gradient(180deg, #faf9f5 0%, #f3f1e8 100%);
+  color: var(--dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .36;
+  background-image:
+    linear-gradient(rgba(20,20,19,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20,20,19,.025) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, #000, transparent 78%);
+}
+
+button, input { font: inherit; }
+
+/* Header */
+header {
+  min-height: 68px;
+  padding: 14px clamp(18px, 4vw, 44px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  position: relative;
+  z-index: 2;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--dark);
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+.logo-bars {
+  display: flex;
+  gap: 2.5px;
+  align-items: flex-end;
+  height: 18px;
+}
+.logo-bars span {
+  display: block;
+  width: 2.5px;
+  background: var(--orange);
+  border-radius: 2px;
+}
+.logo-bars span:nth-child(1) { height: 18px; }
+.logo-bars span:nth-child(2) { height: 10px; background: var(--light); }
+.logo-bars span:nth-child(3) { height: 18px; }
+.logo-bars span:nth-child(4) { height: 7px; background: var(--green); }
+.logo-bars span:nth-child(5) { height: 15px; }
+.logo-bars span:nth-child(6) { height: 18px; background: var(--light); }
+.logo-bars span:nth-child(7) { height: 8px; }
+
+.header-copy { min-width: 0; }
+.header-title {
+  display: block;
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--dark);
+  line-height: 1.1;
+}
+.header-subtitle {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: rgba(20,20,19,.58);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dark);
+  background: rgba(255,255,255,0.58);
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 0 rgba(255,255,255,.72) inset;
+  white-space: nowrap;
+}
+
+/* Layout */
+main {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto 18px;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+  position: relative;
+  z-index: 1;
+}
+
+.panel {
+  background: rgba(250,249,245,.76);
+  border: 1px solid rgba(20,20,19,.11);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+}
+
+.sidebar {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+
+.intro-card {
+  background: var(--dark);
+  color: var(--light);
+  border-radius: 19px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.intro-card::after {
+  content: '';
+  position: absolute;
+  right: -42px;
+  top: -48px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(217,119,87,.34);
+  box-shadow: -54px 76px 0 rgba(106,155,204,.18);
+}
+.eyebrow, .section-label, .preview-panel-heading {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.eyebrow { color: var(--orange); position: relative; z-index: 1; }
+.intro-card h1 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: clamp(24px, 4vw, 34px);
+  line-height: .98;
+  letter-spacing: -0.055em;
+  margin-top: 10px;
+  max-width: 260px;
+  position: relative;
+  z-index: 1;
+}
+.intro-card p {
+  margin-top: 12px;
+  max-width: 280px;
+  color: rgba(250,249,245,.72);
+  font-size: 13px;
+  line-height: 1.5;
+  position: relative;
+  z-index: 1;
+}
+
+.control-card, .help-card {
+  background: rgba(255,254,250,.74);
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  padding: 16px;
+  box-shadow: 0 1px 0 rgba(255,255,255,.7) inset;
+}
+.section-label { color: rgba(20,20,19,.46); margin-bottom: 12px; }
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field label, .slider-label-row label {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--dark);
+}
+.field input {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  padding: 13px 14px;
+  border: 1.5px solid rgba(20,20,19,.13);
+  border-radius: 14px;
+  background: #fffefa;
+  color: var(--dark);
+  outline: none;
+  transition: border-color .16s, box-shadow .16s, transform .16s;
+  -webkit-appearance: none;
+}
+.field input:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 4px rgba(217,119,87,0.14);
+}
+.field input::placeholder { color: rgba(176,174,165,.85); font-weight: 600; }
+.field-hint { font-size: 12px; color: rgba(20,20,19,.55); line-height: 1.45; }
+
+.quick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+.quick-chip {
+  border: 1px solid var(--line);
+  background: rgba(232,230,220,.42);
+  color: rgba(20,20,19,.72);
+  border-radius: 999px;
+  padding: 6px 9px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .15s ease;
+}
+.quick-chip:hover { border-color: var(--orange); color: var(--dark); background: rgba(217,119,87,.10); }
+
+.tuning-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(232,230,220,.30);
+  border: 1px solid rgba(20,20,19,.08);
+  border-radius: 15px;
+  padding: 12px;
+}
+.slider-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.slider-value {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--orange);
+  font-weight: 700;
+  white-space: nowrap;
+}
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--orange), var(--blue));
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--light);
+  border: 5px solid var(--dark);
+  box-shadow: 0 2px 8px rgba(20,20,19,.22);
+  transition: transform .12s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+input[type=range]::-moz-range-thumb {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--light);
+  border: 5px solid var(--dark);
+  box-shadow: 0 2px 8px rgba(20,20,19,.22);
+}
+
+.btn-generate {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px 18px;
+  background: var(--dark);
+  color: var(--light);
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .02em;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: transform .12s, background .15s, box-shadow .15s;
+  box-shadow: 0 10px 22px rgba(20,20,19,.18);
+}
+.btn-generate:hover { background: #292925; box-shadow: 0 12px 26px rgba(20,20,19,.22); }
+.btn-generate:active { transform: translateY(1px) scale(.99); }
+
+.error-msg {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 12px;
+  color: #8b2d1f;
+  background: rgba(217,119,87,.12);
+  border: 1px solid rgba(217,119,87,.28);
+  border-radius: 13px;
+  padding: 11px 13px;
+  display: none;
+}
+.error-msg.visible { display: block; }
+
+.help-card { display: grid; gap: 11px; }
+.help-item { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; }
+.help-dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  color: var(--dark); background: var(--subtle);
+}
+.help-item:nth-child(2) .help-dot { background: rgba(106,155,204,.32); }
+.help-item:nth-child(3) .help-dot { background: rgba(120,140,93,.30); }
+.help-item strong { display: block; font-family: 'Poppins', Arial, sans-serif; font-size: 12px; margin-bottom: 2px; }
+.help-item span { display: block; color: rgba(20,20,19,.58); font-size: 12px; line-height: 1.38; }
+
+/* Preview */
+.preview-panel {
+  padding: 18px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px;
+}
+.preview-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 2px 3px 0;
+}
+.preview-panel-heading { color: rgba(20,20,19,.46); }
+.preview-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.meta-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(20,20,19,.72);
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.46);
+  border-radius: 999px;
+  padding: 7px 10px;
+}
+.meta-pill.ready { color: var(--green); background: rgba(120,140,93,.12); border-color: rgba(120,140,93,.24); }
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 14px;
+  min-height: 420px;
+}
+
+.barcode-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,254,250,.94)),
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(20,20,19,0.015) 3px, rgba(20,20,19,0.015) 4px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: clamp(22px, 4vw, 38px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
+}
+.barcode-card::before {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  border: 1px dashed rgba(20,20,19,.13);
+  border-radius: 16px;
+  pointer-events: none;
+}
+.barcode-card::after {
+  content: '';
+  position: absolute;
+  width: 180px; height: 180px;
+  right: -90px; bottom: -90px;
+  background: rgba(217,119,87,.10);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.barcode-card svg {
+  display: block;
+  max-width: 100%;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 2px 0 rgba(20,20,19,.04));
+}
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  color: rgba(20,20,19,.56);
+  max-width: 340px;
+  position: relative;
+  z-index: 1;
+}
+.empty-icon-wrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 24px;
+  background: var(--dark);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 20px 42px rgba(20,20,19,.18);
+}
+.empty-icon {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+}
+.empty-icon span {
+  display: block;
+  width: 4px;
+  background: var(--light);
+  border-radius: 2px;
+}
+.empty-state h2 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 24px;
+  letter-spacing: -0.045em;
+  color: var(--dark);
+  line-height: 1;
+}
+.empty-state p { font-size: 13px; line-height: 1.5; }
+
+.info-rail {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 14px;
+}
+.rail-card {
+  background: var(--dark);
+  color: var(--light);
+  border-radius: 22px;
+  padding: 17px;
+  overflow: hidden;
+  position: relative;
+}
+.rail-card.light {
+  background: rgba(255,254,250,.66);
+  color: var(--dark);
+  border: 1px solid var(--line);
+}
+.rail-card::after {
+  content: '';
+  position: absolute;
+  right: -28px; bottom: -32px;
+  width: 88px; height: 88px;
+  background: rgba(217,119,87,.32);
+  border-radius: 50%;
+}
+.rail-label {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(250,249,245,.52);
+  position: relative;
+  z-index: 1;
+}
+.rail-card.light .rail-label { color: rgba(20,20,19,.42); }
+.rail-value {
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  position: relative;
+  z-index: 1;
+  word-break: break-all;
+}
+.rail-note {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(250,249,245,.68);
+  position: relative;
+  z-index: 1;
+}
+.rail-card.light .rail-note { color: rgba(20,20,19,.55); }
+
+.security-card {
+  background: rgba(232,230,220,.36);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 17px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+}
+.security-bars { display: flex; align-items: end; gap: 5px; height: 54px; opacity: .72; }
+.security-bars span { width: 8px; border-radius: 6px 6px 2px 2px; background: var(--dark); }
+.security-bars span:nth-child(2n) { background: var(--orange); }
+.security-bars span:nth-child(3n) { background: var(--blue); }
+.security-bars span:nth-child(1) { height: 42px; }
+.security-bars span:nth-child(2) { height: 24px; }
+.security-bars span:nth-child(3) { height: 50px; }
+.security-bars span:nth-child(4) { height: 18px; }
+.security-bars span:nth-child(5) { height: 38px; }
+.security-bars span:nth-child(6) { height: 50px; }
+.security-bars span:nth-child(7) { height: 28px; }
+.security-bars span:nth-child(8) { height: 44px; }
+.security-card p { font-size: 12px; line-height: 1.45; color: rgba(20,20,19,.58); }
+
+.action-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.btn-secondary {
+  padding: 10px 14px;
+  background: rgba(255,254,250,.68);
+  color: var(--dark);
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .12s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.btn-secondary:hover { border-color: rgba(20,20,19,.42); background: #fffefa; }
+.btn-secondary:active { transform: translateY(1px); }
+.btn-secondary.primary-action { background: var(--orange); color: var(--dark); border-color: rgba(20,20,19,.08); }
+.btn-secondary svg { flex-shrink: 0; }
+
+footer {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto 20px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.footer-left { font-size: 12px; color: rgba(20,20,19,.54); }
+.footer-right { display: flex; align-items: center; gap: 7px; }
+.offline-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(120,140,93,.14); }
+.offline-label { font-family: var(--mono); font-size: 11px; color: var(--green); font-weight: 700; }
+
+@media (max-width: 960px) {
+  main { grid-template-columns: 1fr; }
+  .sidebar { display: grid; grid-template-columns: 1fr 1.1fr; align-items: start; }
+  .help-card { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); }
+  .workspace { grid-template-columns: 1fr; }
+  .info-rail { grid-template-columns: repeat(3, 1fr); grid-template-rows: auto; }
+}
+
+@media (max-width: 680px) {
+  header, footer { width: 100%; }
+  header { padding-inline: 16px; }
+  .header-subtitle { display: none; }
+  .header-badge { display: none; }
+  main { width: calc(100% - 20px); gap: 10px; }
+  .sidebar, .preview-panel { padding: 12px; }
+  .sidebar, .help-card, .info-rail, .tuning-grid { grid-template-columns: 1fr; }
+  .workspace { min-height: auto; }
+  .barcode-card { min-height: 320px; }
+  .preview-top { align-items: flex-start; flex-direction: column; }
+  .action-row { justify-content: stretch; }
+  .btn-secondary { flex: 1; justify-content: center; }
+}
+
+@media print {
+  body { background: #fff; }
+  body::before, header, .sidebar, footer, .action-row, .preview-top, .info-rail { display: none !important; }
+  main { display: block; width: auto; margin: 0; }
+  .panel, .preview-panel { box-shadow: none; border: none; padding: 0; background: #fff; }
+  .workspace { display: block; min-height: unset; }
+  .barcode-card { border: none; padding: 0; min-height: unset; box-shadow: none; height: 100vh; }
+  .barcode-card::before, .barcode-card::after { display: none; }
+}
 </style>
 </head>
 <body>
-<header>Student ID Encoder - JRAHS</header>
+
+<header>
+  <div class="header-left">
+    <div class="logo-mark" aria-hidden="true">
+      <div class="logo-bars">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="header-copy">
+      <span class="header-title">Student ID Encoder</span>
+      <span class="header-subtitle">Code 39 barcode encoder with spacing</span>
+    </div>
+  </div>
+</header>
+
 <main>
-<form id="f" class="panel">
-  <label>Number<input id="data" placeholder="Student ID (Found On Card / Sentral)" inputmode="text"/></label>
-  <label>Scale<input id="scale" type="number" min="1" max="10" value="2"/></label>
-  <label>Height<input id="height" type="number" min="40" max="320" value="50"/></label>
-  <button type="submit">Generate</button>
-</form>
-<div class="panel"><div id="preview" class="preview">Your barcode will appear here</div></div>
+  <aside class="sidebar panel">
+    <section class="intro-card">
+      <p class="eyebrow">JRAHS Utility</p>
+      <h1>JRAHS Student ID Encoder</h1>
+      <p>Enter your student number, tune the size, then print or save PNG. Usable as a Library Card, Sign In and More</p>
+    </section>
+
+    <section class="control-card">
+      <p class="section-label">Configuration</p>
+      <div class="field">
+        <label for="data">Student ID</label>
+        <input id="data" type="text" placeholder="e.g. 450674865" inputmode="text" autocomplete="off" spellcheck="false"/>
+        <p class="field-hint">Use 9 Digit Student ID. Find it on the sentral portal.</p>
+      </div>
+
+
+      <div class="tuning-grid">
+        <div class="slider-row">
+          <div class="slider-label-row">
+            <label for="scale">Bar width</label>
+            <span class="slider-value" id="scale-val">2×</span>
+          </div>
+          <input type="range" id="scale" min="1" max="6" value="2"/>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-label-row">
+            <label for="height">Height</label>
+            <span class="slider-value" id="height-val">50px</span>
+          </div>
+          <input type="range" id="height" min="30" max="200" value="50"/>
+        </div>
+      </div>
+
+      <button class="btn-generate" id="generate-btn">Generate barcode</button>
+    </section>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <section class="help-card">
+      <div class="help-item">
+        <div class="help-dot">1</div>
+        <div><strong>Enter</strong><span>Type or paste the ID exactly as you want it encoded.</span></div>
+      </div>
+      <div class="help-item">
+        <div class="help-dot">2</div>
+        <div><strong>Tune</strong><span>Adjust width and height for scanners, labels, or printing.</span></div>
+      </div>
+      <div class="help-item">
+        <div class="help-dot">3</div>
+        <div><strong>Export</strong><span>Print directly or save the barcode as a PNG image. Trim the barcode after printing.</span></div>
+      </div>
+    </section>
+  </aside>
+
+  <section class="preview-panel panel">
+    <div class="preview-top">
+      <p class="preview-panel-heading">Live preview</p>
+      <div class="preview-meta">
+        <span class="meta-pill ready" id="status-pill">Ready</span>
+        <span class="meta-pill">Student ID</span>
+      </div>
+    </div>
+
+    <div class="workspace">
+      <div class="barcode-card" id="preview">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon-wrap">
+            <div class="empty-icon">
+              <span style="height:36px"></span>
+              <span style="height:20px"></span>
+              <span style="height:36px"></span>
+              <span style="height:14px"></span>
+              <span style="height:28px"></span>
+              <span style="height:36px"></span>
+              <span style="height:10px"></span>
+              <span style="height:24px"></span>
+              <span style="height:36px"></span>
+            </div>
+          </div>
+          <h2>Ready to encode.</h2>
+          <p>Add a student ID on the left. The barcode will appear here at print-friendly scale.</p>
+        </div>
+      </div>
+
+      <aside class="info-rail" aria-label="Barcode details">
+        <div class="rail-card">
+          <p class="rail-label">Current value</p>
+          <div class="rail-value" id="current-value">—</div>
+          <p class="rail-note">Code 39 automatically adds start and stop characters.</p>
+        </div>
+        <div class="rail-card light">
+          <p class="rail-label">Format</p>
+          <div class="rail-value">Code 39</div>
+          <p class="rail-note">Supports A–Z, 0–9, space, and - . $ / + %.</p>
+        </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="action-row" id="action-row" style="display:none">
+      <button class="btn-secondary" id="print-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="3" y="1" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="3" y="9" width="10" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="1" y="5" width="14" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="12" cy="8" r="1" fill="currentColor"/>
+        </svg>
+        Print
+      </button>
+      <button class="btn-secondary primary-action" id="save-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 1v9M4 7l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M1 12v2a1 1 0 001 1h12a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Save as PNG
+      </button>
+    </div>
+  </section>
 </main>
-<footer style="border-top:2px solid var(--ink);padding:10px 16px;font-size:.85rem;color:#333;">
-Offline — Code 39 with printed number.
+
+<footer>
+  <span class="footer-left">James Ruse Agricultural High School</span>
+  <div class="footer-right">
+    <div class="offline-dot"></div>
+    <span class="offline-label">Offline · no data sent</span>
+  </div>
 </footer>
+
 <script>
-// Code 39 patterns: narrow=1, wide=3 modules
 const CODE39 = {
   '0':"101001101101",'1':"110100101011",'2':"101100101011",'3':"110110010101",
   '4':"101001101011",'5':"110100110101",'6':"101100110101",'7':"101001011011",
@@ -46,62 +808,196 @@ const CODE39 = {
   'S':"101101011001",'T':"101011011001",'U':"110010101011",'V':"100110101011",
   'W':"110011010101",'X':"100101101011",'Y':"110010110101",'Z':"100110110101",
   '-':"100101011011",'.':"110010101101",' ':"100110101101",'$':"100100100101",
-  '/':"100100101001",'+':"100101001001",'%':"101001001001",
-  '*':"100101101101" // Start/stop
+  '/':"100100101001",'+':"100101001001",'%':"101001001001",'*':"100101101101"
 };
-function code39Pattern(text){
-  text = '*'+text.toUpperCase()+'*';
+
+function code39Pattern(text) {
+  text = '*' + text.toUpperCase() + '*';
   let pattern = '';
-  for(let i=0;i<text.length;i++){
+  for (let i = 0; i < text.length; i++) {
     const p = CODE39[text[i]];
-    if(!p) throw Error('Invalid character: '+text[i]);
-    pattern += p + '0'; // inter-character narrow space
+    if (!p) throw new Error('Invalid character: "' + text[i] + '"');
+    pattern += p + '0';
   }
-  return pattern.slice(0,-1); // remove last space
+  return pattern.slice(0, -1);
 }
-function makeSVG(pattern, scale, height, text){
-  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
-  const quiet = 10*scale;
-  const totalW = quiet*2 + pattern.length*scale;
+
+function makeSVG(pattern, scale, height, label) {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  const quiet = 10 * scale;
+  const totalW = quiet * 2 + pattern.length * scale;
+  const totalH = height + 32;
+
   svg.setAttribute("width", totalW);
-  svg.setAttribute("height", height+20);
+  svg.setAttribute("height", totalH);
+  svg.setAttribute("viewBox", `0 0 ${totalW} ${totalH}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `Code 39 barcode for ${label}`);
+
   let x = quiet;
-  for(let i=0;i<pattern.length;i++){
-    if(pattern[i]==='1'){
-      const r = document.createElementNS(svg.namespaceURI,'rect');
-      r.setAttribute('x',x);
-      r.setAttribute('y',0);
-      r.setAttribute('width',scale);
-      r.setAttribute('height',height);
-      r.setAttribute('fill','#000');
+  for (let i = 0; i < pattern.length; i++) {
+    if (pattern[i] === '1') {
+      const r = document.createElementNS(ns, 'rect');
+      r.setAttribute('x', x);
+      r.setAttribute('y', 0);
+      r.setAttribute('width', scale);
+      r.setAttribute('height', height);
+      r.setAttribute('fill', '#141413');
       svg.appendChild(r);
     }
     x += scale;
   }
-  const t = document.createElementNS(svg.namespaceURI,'text');
-  t.setAttribute('x', totalW/2);
-  t.setAttribute('y', height+2);
-  t.setAttribute('text-anchor','middle');
-  t.setAttribute('class','bar-text');
-  t.textContent = text;
+
+  const t = document.createElementNS(ns, 'text');
+  t.setAttribute('x', totalW / 2);
+  t.setAttribute('y', height + 9);
+  t.setAttribute('text-anchor', 'middle');
+  t.setAttribute('dominant-baseline', 'hanging');
+  t.setAttribute('font-family', "JetBrains Mono, Courier New, monospace");
+  t.setAttribute('font-size', '13');
+  t.setAttribute('font-weight', '700');
+  t.setAttribute('fill', '#141413');
+  t.setAttribute('letter-spacing', '0.07em');
+  t.textContent = label;
   svg.appendChild(t);
+
   return svg;
 }
-function generate(e){
-  e && e.preventDefault();
-  const prev = document.getElementById('preview');
-  prev.innerHTML='';
-  try{
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.classList.add('visible');
+  document.getElementById('status-pill').textContent = 'Check input';
+  document.getElementById('status-pill').classList.remove('ready');
+}
+
+function clearError() {
+  const el = document.getElementById('error-msg');
+  el.classList.remove('visible');
+  el.textContent = '';
+  document.getElementById('status-pill').textContent = 'Ready';
+  document.getElementById('status-pill').classList.add('ready');
+}
+
+let lastSVG = null;
+const originalEmptyState = document.getElementById('empty-state').cloneNode(true);
+
+function setCurrentValue(value) {
+  document.getElementById('current-value').textContent = value ? value.toUpperCase() : '—';
+}
+
+function restoreEmpty(message) {
+  const preview = document.getElementById('preview');
+  const actionRow = document.getElementById('action-row');
+  preview.innerHTML = '';
+  const clone = originalEmptyState.cloneNode(true);
+  if (message) clone.querySelector('p').textContent = message;
+  preview.appendChild(clone);
+  actionRow.style.display = 'none';
+  lastSVG = null;
+}
+
+function generate() {
+  clearError();
+  const preview = document.getElementById('preview');
+  const actionRow = document.getElementById('action-row');
+
+  try {
     const val = document.getElementById('data').value.trim();
-    if(!val) throw Error('Enter data');
-    const scale = parseInt(document.getElementById('scale').value)||2;
-    const height = parseInt(document.getElementById('height').value)||80;
+    setCurrentValue(val);
+    if (!val) throw new Error('Enter a student ID first.');
+    const scale = parseInt(document.getElementById('scale').value) || 2;
+    const height = parseInt(document.getElementById('height').value) || 50;
     const pattern = code39Pattern(val);
     const svg = makeSVG(pattern, scale, height, val.toUpperCase());
-    prev.appendChild(svg);
-  }catch(err){ prev.textContent = err.message; }
+
+    preview.innerHTML = '';
+    preview.appendChild(svg);
+    lastSVG = svg;
+    actionRow.style.display = 'flex';
+    document.getElementById('status-pill').textContent = 'Generated';
+  } catch(err) {
+    restoreEmpty('Make sure the ID only uses Code 39 supported characters, then try again.');
+    showError(err.message);
+  }
 }
-document.getElementById('f').addEventListener('submit',generate);
+
+const scaleInput = document.getElementById('scale');
+const heightInput = document.getElementById('height');
+const scaleVal = document.getElementById('scale-val');
+const heightVal = document.getElementById('height-val');
+const dataInput = document.getElementById('data');
+
+function updateSliderLabels() {
+  scaleVal.textContent = scaleInput.value + '×';
+  heightVal.textContent = heightInput.value + 'px';
+}
+
+scaleInput.addEventListener('input', () => {
+  updateSliderLabels();
+  if (dataInput.value.trim()) generate();
+});
+
+heightInput.addEventListener('input', () => {
+  updateSliderLabels();
+  if (dataInput.value.trim()) generate();
+});
+
+dataInput.addEventListener('input', () => {
+  clearError();
+  setCurrentValue(dataInput.value.trim());
+});
+
+document.querySelectorAll('.quick-chip').forEach((chip) => {
+  chip.addEventListener('click', () => {
+    dataInput.value = chip.dataset.example;
+    generate();
+    dataInput.focus();
+  });
+});
+
+document.getElementById('generate-btn').addEventListener('click', generate);
+
+dataInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') generate();
+});
+
+document.getElementById('print-btn').addEventListener('click', () => {
+  window.print();
+});
+
+document.getElementById('save-btn').addEventListener('click', () => {
+  if (!lastSVG) return;
+
+  const svgData = new XMLSerializer().serializeToString(lastSVG);
+  const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  const img = new Image();
+
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const padding = 32;
+    canvas.width = img.width + padding * 2;
+    canvas.height = img.height + padding * 2;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, padding, padding);
+    URL.revokeObjectURL(url);
+
+    const a = document.createElement('a');
+    const idVal = document.getElementById('data').value.trim().toUpperCase() || 'barcode';
+    a.download = `JRAHS_${idVal}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+
+  img.src = url;
+});
+
+updateSliderLabels();
 </script>
 </body>
 </html>
